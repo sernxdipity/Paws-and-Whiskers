@@ -1,0 +1,620 @@
+/* ==============================
+   HERO SECTION
+================================ */
+
+.hero {
+    min-height: 650px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    max-width: 1200px;
+    margin: auto;
+
+    padding: 70px 30px;
+    gap: 60px;
+}
+
+
+/* Hero Text */
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-label {
+    color: #789b75;
+
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    margin-bottom: 15px;
+}
+
+.hero h1 {
+    font-size: 58px;
+    line-height: 1.1;
+
+    margin-bottom: 25px;
+}
+
+.hero h1 span {
+    color: #789b75;
+}
+
+.hero-description {
+    max-width: 550px;
+
+    font-size: 18px;
+    color: #666;
+
+    margin-bottom: 30px;
+}
+
+
+/* Buttons */
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 13px 24px;
+    border-radius: 25px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.primary-btn {
+    background-color: #789b75;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #5f815c;
+    transform: translateY(-2px);
+}
+
+.secondary-btn {
+    border: 2px solid #789b75;
+    color: #789b75;
+}
+
+.secondary-btn:hover {
+    background-color: #789b75;
+    color: white;
+}
+
+
+/* Hero Image */
+
+.hero-image {
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+}
+
+.hero-pet-image {
+    width: 550px;
+    height: 550px;
+
+    border-radius: 40px;
+
+    background-color: #e9e3d8;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 80px;
+}
+
+/* ==============================
+   ABOUT SECTION
+================================ */
+
+.about {
+    display: flex;
+    align-items: center;
+    gap: 70px;
+
+    max-width: 1200px;
+    margin: auto;
+    padding: 90px 30px;
+}
+
+.about-image,
+.about-text {
+    flex: 1;
+}
+
+.about-photo {
+    width: 100%;
+    height: 430px;
+
+    object-fit: cover;
+
+    background-color: #e9e3d8;
+    border-radius: 35px;
+
+    box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 90px;
+}
+
+.section-label {
+    color: #789b75;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    margin-bottom: 12px;
+}
+
+.about-text h2 {
+    font-size: 40px;
+    line-height: 1.2;
+
+    margin-bottom: 20px;
+}
+
+.about-text > p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.about-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 12px;
+    margin-top: 25px;
+
+    color: #567353;
+    font-weight: bold;
+}
+
+/* ==============================
+   FLAGSHIP PACKAGES
+================================ */
+
+.flagship {
+    background-color: #f4efe8;
+    padding: 90px 30px;
+}
+
+.section-heading {
+    text-align: center;
+
+    max-width: 650px;
+    margin: 0 auto 45px;
+}
+
+.section-heading h2 {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.section-heading > p:last-child {
+    color: #666;
+}
+
+
+/* Package Grid */
+
+.package-grid {
+    max-width: 1200px;
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+
+/* Package Card */
+
+.package-card {
+    background-color: white;
+
+    border-radius: 25px;
+    overflow: hidden;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+
+    transition: 0.3s;
+}
+
+.package-card:hover {
+    transform: translateY(-8px);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.package-card {
+    height: 500px;
+    width: 400px;
+
+    background-color: #ddd5c9;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 75px;
+}
+
+.package-content {
+    padding: 25px;
+}
+
+.pet-tag {
+    display: inline-block;
+
+    background-color: #e4eee2;
+    color: #567353;
+
+    padding: 5px 10px;
+    border-radius: 15px;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    margin-bottom: 12px;
+}
+
+.package-content h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.package-content p {
+    color: #666;
+    font-size: 14px;
+
+    margin-bottom: 25px;
+}
+
+
+/* Bottom of card */
+
+.package-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.package-bottom strong {
+    color: #567353;
+    font-size: 18px;
+}
+
+.package-bottom a {
+    color: #789b75;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.package-bottom a:hover {
+    text-decoration: underline;
+}
+
+
+/* Explore Services Button */
+
+.view-services {
+    text-align: center;
+    margin-top: 45px;
+}
+
+/* ==============================
+   PET CAROUSEL
+================================ */
+
+.pet-gallery {
+    padding: 90px 30px;
+}
+
+.carousel {
+    max-width: 850px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 25px;
+}
+
+
+/* Main Carousel */
+
+.carousel-content {
+    width: 650px;
+
+    background-color: white;
+
+    border-radius: 30px;
+    overflow: hidden;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+    text-align: center;
+}
+
+.carousel-image {
+    height: 360px;
+
+    background-color: #e9e3d8;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 100px;
+
+    transition: 0.3s;
+}
+
+.carousel-info {
+    padding: 20px;
+}
+
+.carousel-info h3 {
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.carousel-info p {
+    color: #666;
+}
+
+
+/* Carousel Buttons */
+
+.carousel-btn {
+    width: 45px;
+    height: 45px;
+
+    border: none;
+    border-radius: 50%;
+
+    background-color: #789b75;
+    color: white;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.carousel-btn:hover {
+    background-color: #5f815c;
+    transform: scale(1.1);
+}
+
+
+/* Carousel Dots */
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+
+    background-color: #ccc;
+    border-radius: 50%;
+
+    cursor: pointer;
+}
+
+.carousel-dot.active {
+    background-color: #789b75;
+}
+
+/* ==============================
+   TABLET RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 900px) {
+
+    /* Hero */
+
+    .hero {
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 60px 25px;
+    }
+
+
+    .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+
+    .hero h1 {
+        font-size: 48px;
+    }
+
+
+    /* About */
+
+    .about {
+        flex-direction: column;
+
+        gap: 40px;
+
+        padding: 70px 25px;
+    }
+
+
+    .about-image,
+    .about-text {
+        width: 100%;
+    }
+
+
+    /* Packages */
+
+    .package-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    /* Carousel */
+
+    .carousel-content {
+        width: 550px;
+    }
+
+}
+
+/* ==============================
+   MOBILE RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 600px) {
+
+    /* Hero */
+
+    .hero {
+        min-height: auto;
+
+        padding: 50px 20px;
+
+        gap: 40px;
+    }
+
+
+    .hero h1 {
+        font-size: 38px;
+    }
+
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .hero-pet-image {
+        width: 100%;
+        height: 320px;
+
+        font-size: 65px;
+    }
+
+
+    /* About */
+
+    .about {
+        padding: 60px 20px;
+    }
+
+
+    .about-photo {
+        height: 320px;
+    }
+
+
+    .about-text h2 {
+        font-size: 32px;
+    }
+
+
+    .about-features {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Section Headings */
+
+    .section-heading h2 {
+        font-size: 32px;
+    }
+
+
+    /* Packages */
+
+    .flagship {
+        padding: 65px 20px;
+    }
+
+
+    .package-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* Carousel */
+
+    .pet-gallery {
+        padding: 65px 20px;
+    }
+
+
+    .carousel {
+        gap: 8px;
+    }
+
+
+    .carousel-content {
+        width: calc(100% - 90px);
+    }
+
+
+    .carousel-image {
+        height: 280px;
+
+        font-size: 75px;
+    }
+
+
+    .carousel-btn {
+        width: 38px;
+        height: 38px;
+
+        flex-shrink: 0;
+    }
+
+}

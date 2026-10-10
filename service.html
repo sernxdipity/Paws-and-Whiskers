@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Our Services | Paws & Whiskers</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/services.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar">
+
+            <a href="index.html" class="logo">
+                🐾 Paws & Whiskers
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                ☰
+            </button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="service.html">Services</a>
+                <a href="packages.html">Packages</a>
+                <a href="groomers.html">Our Groomers</a>
+                <a href="contact.html">Contact</a>
+
+                <a href="booking.html" class="book-btn">
+                    Book Appointment
+                </a>
+            </div>
+
+        </nav>
+    </header>
+
+
+    <main>
+
+        <!-- Services Header -->
+        <section class="services-header">
+
+            <p class="section-label">OUR SERVICES</p>
+
+            <h1>Premium Care for Every Companion</h1>
+
+            <p>
+                Explore our professional grooming and wellness
+                services designed especially for dogs, cats and rabbits.
+            </p>
+
+        </section>
+
+
+        <!-- Category Filter -->
+        <section class="services-section">
+
+            <div class="filter-bar">
+
+                <button class="filter-btn active" data-category="All">
+                    All Services
+                </button>
+
+                <button class="filter-btn" data-category="Dog">
+                    🐶 Dogs
+                </button>
+
+                <button class="filter-btn" data-category="Cat">
+                    🐱 Cats
+                </button>
+
+                <button class="filter-btn" data-category="Rabbit">
+                    🐰 Rabbits
+                </button>
+
+            </div>
+
+
+            <!--
+                IMPORTANT:
+                Service cards will NOT be written here manually.
+
+                JavaScript will create them.
+            -->
+
+            <div class="services-grid" id="servicesGrid">
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>
+            &copy; 2026 Paws & Whiskers Pet Care & Grooming Centre
+        </p>
+    </footer>
+
+
+    <script src="js/navigation.js"></script>
+    <script src="js/services.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,413 @@
+/* ==============================
+   CONTACT HEADER
+================================ */
+
+.contact-header {
+    text-align: center;
+
+    max-width: 750px;
+    margin: auto;
+
+    padding: 80px 30px 50px;
+}
+
+.section-label {
+    color: #789b75;
+
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    margin-bottom: 12px;
+}
+
+.contact-header h1 {
+    font-size: 46px;
+
+    margin-bottom: 15px;
+}
+
+.contact-header > p:last-child {
+    color: #666;
+
+    font-size: 17px;
+}
+
+
+/* ==============================
+   CONTACT SECTION
+================================ */
+
+.contact-section {
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 30px 30px 100px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 70px;
+}
+
+/* ==============================
+   CONTACT INFORMATION
+================================ */
+
+.contact-info h2 {
+    font-size: 34px;
+
+    margin-bottom: 15px;
+}
+
+.contact-intro {
+    color: #666;
+
+    margin-bottom: 35px;
+}
+
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+
+.info-icon {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    background-color: #e4eee2;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+
+.info-item h3 {
+    font-size: 16px;
+
+    margin-bottom: 4px;
+}
+
+
+.info-item p {
+    color: #666;
+
+    font-size: 14px;
+}
+
+/* ==============================
+   CONTACT FORM
+================================ */
+
+.contact-form-container {
+    background-color: white;
+
+    padding: 35px;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.07);
+}
+
+
+.contact-form-container h2 {
+    font-size: 28px;
+
+    margin-bottom: 5px;
+}
+
+
+.contact-form-container > p {
+    color: #666;
+
+    font-size: 14px;
+
+    margin-bottom: 25px;
+}
+
+
+/* Form Fields */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+    display: block;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    margin-bottom: 7px;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.3s;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #789b75;
+
+    box-shadow:
+        0 0 0 3px rgba(120, 155, 117, 0.12);
+}
+
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* Submit Button */
+
+.submit-btn {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 25px;
+
+    background-color: #789b75;
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.submit-btn:hover {
+    background-color: #5f815c;
+
+    transform: translateY(-2px);
+}
+
+/* ==============================
+   LOCATION / MAP
+================================ */
+
+.location-section {
+    background-color: #f4efe8;
+
+    padding: 80px 30px;
+}
+
+
+.section-heading {
+    max-width: 650px;
+
+    margin: 0 auto 35px;
+
+    text-align: center;
+}
+
+
+.section-heading h2 {
+    font-size: 36px;
+
+    margin-bottom: 10px;
+}
+
+
+.section-heading > p:last-child {
+    color: #666;
+}
+
+
+.map-container {
+    max-width: 1100px;
+
+    height: 400px;
+
+    margin: auto;
+
+    overflow: hidden;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+.map-container iframe {
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+}
+
+/* ==============================
+   PET GUIDELINES
+================================ */
+
+.pet-guidelines {
+    max-width: 1100px;
+
+    margin: 30px auto 0;
+
+    background-color: white;
+
+    padding: 25px 30px;
+
+    border-radius: 20px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 30px;
+}
+
+
+.pet-guidelines h3 {
+    margin-bottom: 5px;
+}
+
+
+.pet-guidelines p {
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+.guideline-btn {
+    flex-shrink: 0;
+
+    background-color: #789b75;
+
+    color: white;
+
+    padding: 11px 20px;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+
+.guideline-btn:hover {
+    background-color: #5f815c;
+
+    transform: translateY(-2px);
+}
+
+/* ==============================
+   RESPONSIVE CONTACT PAGE
+================================ */
+
+@media (max-width: 850px) {
+
+    .contact-section {
+        grid-template-columns: 1fr;
+
+        gap: 45px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .contact-header {
+        padding:
+            60px 20px 40px;
+    }
+
+
+    .contact-header h1 {
+        font-size: 36px;
+    }
+
+
+    .contact-section {
+        padding:
+            20px 20px 70px;
+    }
+
+
+    .contact-info h2 {
+        font-size: 29px;
+    }
+
+
+    .contact-form-container {
+        padding: 25px 20px;
+    }
+
+
+    .location-section {
+        padding: 60px 20px;
+    }
+
+
+    .map-container {
+        height: 320px;
+
+        border-radius: 18px;
+    }
+
+
+    .pet-guidelines {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        padding: 22px;
+    }
+
+
+    .guideline-btn {
+        width: 100%;
+
+        text-align: center;
+    }
+
+}

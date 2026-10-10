@@ -1,0 +1,298 @@
+/* ==============================
+   SERVICES HEADER
+================================ */
+
+.services-header {
+    text-align: center;
+
+    padding: 80px 30px 50px;
+
+    max-width: 800px;
+    margin: auto;
+}
+
+.section-label {
+    color: #789b75;
+
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    margin-bottom: 12px;
+}
+
+.services-header h1 {
+    font-size: 46px;
+    margin-bottom: 15px;
+}
+
+.services-header > p:last-child {
+    color: #666;
+    font-size: 17px;
+
+    max-width: 650px;
+    margin: auto;
+}
+
+
+/* ==============================
+   SERVICES SECTION
+================================ */
+
+.services-section {
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding: 20px 30px 100px;
+}
+
+/* ==============================
+   CATEGORY FILTER
+================================ */
+
+.filter-bar {
+    display: flex;
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 45px;
+
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    border: 1px solid #d8d8d8;
+
+    background-color: white;
+    color: #555;
+
+    padding: 11px 20px;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.filter-btn:hover {
+    border-color: #789b75;
+
+    color: #789b75;
+
+    transform: translateY(-2px);
+}
+
+
+/* Selected category */
+
+.filter-btn.active {
+    background-color: #789b75;
+    border-color: #789b75;
+
+    color: white;
+}
+
+/* ==============================
+   SERVICES GRID
+================================ */
+
+.services-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+/* ==============================
+   SERVICE CARDS
+================================ */
+
+.service-card {
+    background-color: white;
+
+    border-radius: 22px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.06);
+
+    transition: 0.3s;
+
+    animation: fadeIn 0.4s ease;
+}
+
+
+.service-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Service Image */
+
+.service-image {
+    height: 210px;
+
+    background-color: #e9e3d8;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    font-size: 75px;
+}
+
+
+/* Service Content */
+
+.service-content {
+    padding: 22px;
+}
+
+
+.category-tag {
+    display: inline-block;
+
+    background-color: #e4eee2;
+    color: #567353;
+
+    padding: 5px 10px;
+
+    border-radius: 15px;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    margin-bottom: 10px;
+}
+
+
+.service-content h3 {
+    font-size: 20px;
+
+    margin-bottom: 10px;
+}
+
+
+.service-content p {
+    color: #666;
+
+    font-size: 14px;
+
+    margin-bottom: 22px;
+}
+
+
+/* Price and Booking */
+
+.service-bottom {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.service-price {
+    color: #567353;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+.service-bottom a {
+    color: #789b75;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+
+.service-bottom a:hover {
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* ==============================
+   RESPONSIVE SERVICES
+================================ */
+
+@media (max-width: 900px) {
+
+    .services-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .services-header {
+        padding:
+            60px 20px 40px;
+    }
+
+
+    .services-header h1 {
+        font-size: 36px;
+    }
+
+
+    .services-section {
+        padding:
+            10px 20px 70px;
+    }
+
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .filter-bar {
+        gap: 8px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .filter-btn {
+        padding: 9px 14px;
+
+        font-size: 13px;
+    }
+
+
+    .service-image {
+        height: 230px;
+    }
+
+}
