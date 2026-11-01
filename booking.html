@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | Paws & Whiskers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <style>
+        .booking-header { text-align: center; padding: 80px 30px 40px; }
+        .section-label { color: #789b75; font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; }
+        .booking-header h1 { font-size: 46px; margin-bottom: 15px; }
+        
+        .booking-wrapper { max-width: 800px; margin: 0 auto 100px; position: relative; padding: 0 20px; }
+        .form-container { background: white; padding: 50px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); transition: opacity 0.4s ease; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 5px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; }
+        .form-group input:not([type="checkbox"]), .form-group select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; transition: 0.3s; }
+        .form-group input:not([type="checkbox"]):focus, .form-group select:focus { border-color: #789b75; box-shadow: 0 0 0 3px rgba(120, 155, 117, 0.12); }
+        .form-group input.invalid, .form-group select.invalid { border-color: #ff4d4d; background: #fff5f5; }
+        
+        /* Add-ons Grid Styling */
+        .addons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; border: 1px solid #ddd; border-radius: 12px; background: #f9fdf9; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555; cursor: pointer; margin: 0; }
+        .checkbox-group input[type="checkbox"] { width: auto; transform: scale(1.3); accent-color: #789b75; cursor: pointer; }
+        
+        .error-msg { color: #ff4d4d; font-size: 12px; display: none; margin-top: 6px; font-weight: 500; }
+        
+        .submit-btn { grid-column: 1 / -1; padding: 16px; background: #789b75; color: white; border: none; border-radius: 25px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .submit-btn:hover { background: #5f815c; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(120,155,117,0.3); }
+        
+        #receiptContainer { display: none; background: white; padding: 50px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; animation: slideUp 0.5s ease forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* CSS Checkmark instead of emoji */
+        .success-icon { width: 80px; height: 80px; background: #e4eee2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; position: relative; }
+        .success-icon::after { content: ""; width: 20px; height: 35px; border-bottom: 5px solid #789b75; border-right: 5px solid #789b75; transform: rotate(45deg); margin-bottom: 10px; }
+        
+        .receipt-header { font-family: "DM Serif Display", serif; font-size: 32px; color: #333; margin-bottom: 10px; }
+        .receipt-desc { color: #666; margin-bottom: 30px; }
+        .receipt-card { background: #f4efe8; border-radius: 15px; padding: 30px; text-align: left; border: 2px dashed #ddd5c9; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .receipt-row:last-child { border-bottom: none; }
+        .receipt-row span.label { color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; flex-shrink: 0; margin-right: 15px; }
+        .receipt-row span.val { color: #333; font-weight: 600; font-size: 16px; text-align: right; }
+
+        @media (max-width: 600px) { 
+            .form-grid { grid-template-columns: 1fr; } 
+            .addons-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">🐾Paws & Whiskers</a>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="service.html">Services</a>
+                <a href="packages.html">Packages</a>
+                <a href="groomers.html">Our Groomers</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="book-btn">Book Appointment</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="booking-header">
+            <p class="section-label">RESERVATION</p>
+            <h1>Schedule a Session</h1>
+        </section>
+
+        <section class="booking-wrapper">
+            <div class="form-container" id="formContainer">
+                <form id="bookingForm" class="form-grid">
+                    
+                    <div class="form-group full-width">
+                        <label>Owner Name</label>
+                        <input type="text" id="ownerName" placeholder="Your full name" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Contact Phone (Malaysian format)</label>
+                        <input 
+                            type="tel" 
+                            id="contactPhone" 
+                            placeholder="012-3456789" 
+                            required 
+                            pattern="^01\d-?\d{7,8}$" 
+                            title="Please enter a valid Malaysian number (e.g., 012-3456789)"
+                            oninput="this.value = this.value.replace(/[^0-9-]/g, '')"
+                        >
+                        <div class="error-msg" id="phoneError">Invalid format. Must be a Malaysian number.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pet Name</label>
+                        <input type="text" id="petName" placeholder="Pet's name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pet Type</label>
+                        <select id="petType" required>
+                            <option value="">Select Category...</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Rabbit">Rabbit</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Selected Grooming Package</label>
+                        <select id="selectedPackage" required>
+                            <option value="">Choose a treatment...</option>
+                            <option value="Bronze Treatment (RM35)">Bronze Treatment (RM35)</option>
+                            <option value="Silver Treatment (RM55)">Silver Treatment (RM55)</option>
+                            <option value="Gold Spa Treatment (RM85)">Gold Spa Treatment (RM85)</option>
+                            <option value="Specific Services Only">No Base Package (Specific Services Only)</option>
+                        </select>
+                        <small style="color: #777; font-size: 12px; margin-top: 6px; display: block; font-style: italic;">
+                            *Please note: The prices shown are base estimates. The final price may vary slightly upon arrival depending on your pet's exact size, breed, and coat condition.
+                        </small>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Specific Services & Spa Add-ons</label>
+                        <div class="addons-grid">
+                            <!-- Basic standalone services added -->
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Nail Trimming Only (+RM15)"> Nail Trimming Only (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Ear Cleaning Only (+RM10)"> Ear Cleaning Only (+RM10)</label>
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Flea & Tick Treatment (+RM15)"> Flea & Tick Treatment (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="De-matting (+RM25)"> De-matting (+RM25)</label>
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Blueberry Facial (+RM15)"> Blueberry Facial (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Soothing Mud Bath (+RM20)"> Soothing Mud Bath (+RM20)</label>
+                        </div>
+                        <div class="error-msg" id="servicesError">Please select at least one specific service since you did not choose a base package.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Appointment Date</label>
+                        <input type="date" id="appDate" required>
+                        <div class="error-msg" id="dateError">Date must be scheduled in the future.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Time Slot</label>
+                        <input type="time" id="appTime" required>
+                        <div class="error-msg" id="timeError">Please select a valid time within our operating hours.</div>
+                        <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                            Mon-Fri: 9:00 AM - 7:00 PM | Sat-Sun: 10:00 AM - 6:00 PM
+                        </small>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Confirm Reservation</button>
+                </form>
+            </div>
+
+            <div id="receiptContainer">
+                <div class="success-icon"></div>
+                <h2 class="receipt-header">Booking Confirmed</h2>
+                <p class="receipt-desc">We look forward to pampering your pet. Here is your receipt.</p>
+                
+                <div class="receipt-card" id="receiptData"></div>
+                
+                <a href="index.html" style="display:inline-block; margin-top:30px; color:#789b75; font-weight:bold; text-decoration:none;">Return to Homepage</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 Paws & Whiskers Pet Care & Grooming Centre. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+    <script>
+        const bookingForm = document.getElementById('bookingForm');
+        const dateInput = document.getElementById('appDate');
+        
+        // Physically block past dates in the calendar picker
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            const phoneInput = document.getElementById('contactPhone');
+            const phone = phoneInput.value;
+            const appDate = dateInput.value;
+            const timeInput = document.getElementById('appTime');
+            const appTime = timeInput.value;
+            const pack = document.getElementById('selectedPackage').value;
+            
+            let isValid = true;
+
+            // Gather selected checkboxes early for validation
+            const addonElements = document.querySelectorAll('input[name="addon"]:checked');
+            let selectedAddons = [];
+            addonElements.forEach(el => selectedAddons.push(el.value));
+
+            // 1. Specific Services Validation
+            const servicesErrorDiv = document.getElementById('servicesError');
+            const addonsGrid = document.querySelector('.addons-grid');
+            if (pack === "Specific Services Only" && selectedAddons.length === 0) {
+                servicesErrorDiv.style.display = 'block';
+                addonsGrid.style.borderColor = '#ff4d4d';
+                addonsGrid.style.backgroundColor = '#fff5f5';
+                isValid = false;
+            } else {
+                servicesErrorDiv.style.display = 'none';
+                addonsGrid.style.borderColor = '#ddd';
+                addonsGrid.style.backgroundColor = '#f9fdf9';
+            }
+
+            // 2. Double-Check Phone Validation
+            const phoneRegex = /^(01)[0-46-9]-*[0-9]{7,8}$/; 
+            if (!phoneRegex.test(phone.replace(/\s+/g, ''))) {
+                document.getElementById('phoneError').style.display = 'block';
+                phoneInput.classList.add('invalid');
+                isValid = false;
+            } else {
+                document.getElementById('phoneError').style.display = 'none';
+                phoneInput.classList.remove('invalid');
+            }
+
+            // 3. Double-Check Date Validation
+            if (appDate < today) {
+                document.getElementById('dateError').style.display = 'block';
+                dateInput.classList.add('invalid');
+                isValid = false;
+            } else {
+                document.getElementById('dateError').style.display = 'none';
+                dateInput.classList.remove('invalid');
+            }
+
+            // 4. Dynamic Time Validation based on Operating Hours
+            if (appDate && appTime) {
+                const selectedDateObj = new Date(appDate);
+                const dayOfWeek = selectedDateObj.getDay(); // 0 is Sunday, 6 is Saturday
+                let timeErrorMessage = "";
+                let isTimeValid = true;
+
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    // Weekend: 10:00 AM (10:00) to 6:00 PM (18:00)
+                    if (appTime < "10:00" || appTime > "18:00") {
+                        isTimeValid = false;
+                        timeErrorMessage = "Weekend hours are from 10:00 AM to 6:00 PM.";
+                    }
+                } else {
+                    // Weekday: 9:00 AM (09:00) to 7:00 PM (19:00)
+                    if (appTime < "09:00" || appTime > "19:00") {
+                        isTimeValid = false;
+                        timeErrorMessage = "Weekday hours are from 9:00 AM to 7:00 PM.";
+                    }
+                }
+
+                if (!isTimeValid) {
+                    const timeErrorDiv = document.getElementById('timeError');
+                    timeErrorDiv.innerText = timeErrorMessage;
+                    timeErrorDiv.style.display = 'block';
+                    timeInput.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    document.getElementById('timeError').style.display = 'none';
+                    timeInput.classList.remove('invalid');
+                }
+            }
+
+            // 5. Build and Display Receipt if Valid
+            if (isValid) {
+                const owner = document.getElementById('ownerName').value;
+                const pet = document.getElementById('petName').value;
+                const type = document.getElementById('petType').value;
+
+                const addonsOutput = selectedAddons.length > 0 ? selectedAddons.join('<br>') : 'None selected';
+
+                // Format the date beautifully
+                const dateObj = new Date(appDate);
+                const prettyDate = dateObj.toLocaleDateString('en-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                // Format time nicely
+                const [hourString, minute] = appTime.split(':');
+                let hour = parseInt(hourString);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12;
+                hour = hour ? hour : 12;
+                const prettyTime = hour + ':' + minute + ' ' + ampm;
+
+                // Inject into the receipt
+                document.getElementById('receiptData').innerHTML = `
+                    <div class="receipt-row"><span class="label">Owner</span><span class="val">${owner}</span></div>
+                    <div class="receipt-row"><span class="label">Contact</span><span class="val">${phone}</span></div>
+                    <div class="receipt-row"><span class="label">Pet</span><span class="val">${pet} (${type})</span></div>
+                    <div class="receipt-row"><span class="label">Package</span><span class="val" style="color:#567353;">${pack}</span></div>
+                    <div class="receipt-row"><span class="label">Specific Services</span><span class="val" style="color:#567353; text-align:right;">${addonsOutput}</span></div>
+                    <div class="receipt-row"><span class="label">Date</span><span class="val">${prettyDate}</span></div>
+                    <div class="receipt-row"><span class="label">Time</span><span class="val">${prettyTime}</span></div>
+                `;
+
+                // Fade out form and reveal receipt
+                const container = document.getElementById('formContainer');
+                container.style.opacity = '0';
+                
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    const receipt = document.getElementById('receiptContainer');
+                    receipt.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 400);
+            }
+        });
+    </script>
+</body>
+</html>

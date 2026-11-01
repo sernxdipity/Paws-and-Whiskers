@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grooming Packages | Paws & Whiskers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <style>
+        .packages-header { text-align: center; padding: 80px 30px 40px; max-width: 800px; margin: auto; }
+        .section-label { color: #789b75; font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; }
+        .packages-header h1 { font-size: 46px; margin-bottom: 15px; }
+        
+        .pricing-grid { max-width: 1100px; margin: 0 auto 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 30px; }
+        .package-card { background: white; border-radius: 25px; padding: 40px 30px; text-align: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
+        .package-card:hover { transform: translateY(-7px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); }
+        .package-card.silver { border: 2px solid #789b75; transform: scale(1.05); z-index: 1; }
+        .package-card.silver:hover { transform: scale(1.05) translateY(-7px); }
+        
+        .popular-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #789b75; color: white; padding: 6px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
+        .package-name { font-family: "DM Serif Display", serif; font-size: 28px; margin-bottom: 10px; color: #333; }
+        .package-price { font-size: 38px; font-weight: bold; color: #567353; margin-bottom: 25px; }
+        
+        .package-features { list-style: none; padding: 0; margin-bottom: 35px; text-align: left; flex-grow: 1; }
+        .package-features li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 15px; display: flex; align-items: flex-start; gap: 10px; }
+        .package-features li::before { content: "✓"; color: #789b75; font-weight: bold; }
+        
+        /* Estimator Styling */
+        .estimator-section { max-width: 900px; margin: 0 auto 100px; background: #fffaf5; padding: 50px; border-radius: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); border: 1px solid #e4eee2; }
+        .estimator-section h2 { font-size: 32px; margin-bottom: 10px; font-family: "DM Serif Display", serif; text-align: center; color: #2f352f; }
+        .estimator-desc { text-align: center; color: #666; margin-bottom: 35px; }
+        
+        .estimator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; }
+        .form-group select { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; transition: 0.3s; font-family: inherit; cursor: pointer; }
+        .form-group select:focus { border-color: #789b75; box-shadow: 0 0 0 3px rgba(120, 155, 117, 0.12); }
+        
+        .addons-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; display: grid; grid-template-columns: 1fr; gap: 12px;}
+        .checkbox-group { display: flex; align-items: center; gap: 12px; cursor: pointer; color: #555; font-size: 14px; margin: 0;}
+        .checkbox-group input { transform: scale(1.2); accent-color: #789b75; cursor: pointer; }
+        
+        .total-display { background: #2f352f; color: white; padding: 25px; border-radius: 15px; text-align: center; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .total-display span:first-child { font-size: 18px; font-weight: 500; }
+        .total-display span#estTotal { font-size: 36px; font-weight: bold; color: #789b75; font-family: "DM Serif Display", serif; }
+
+        @media (max-width: 850px) { 
+            .package-card.silver { transform: scale(1); } 
+            .package-card.silver:hover { transform: translateY(-7px); }
+            .estimator-grid { grid-template-columns: 1fr; } 
+            .total-display { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="logo">🐾Paws & Whiskers</a>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="service.html">Services</a>
+                <a href="packages.html">Packages</a>
+                <a href="groomers.html">Our Groomers</a>
+                <a href="contact.html">Contact</a>
+                <a href="booking.html" class="book-btn">Book Appointment</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="packages-header">
+            <p class="section-label">PRICING TIERS</p>
+            <h1>Choose the Perfect Spa Day</h1>
+            <p style="color:#666; font-size:17px; max-width:650px; margin:auto;">From essential hygiene to ultimate luxury, find the right grooming package to keep your pet healthy, happy, and looking their best.</p>
+        </section>
+
+        <!-- Dynamic Pricing Grid -->
+        <section class="pricing-grid">
+            <div class="package-card">
+                <h2 class="package-name">Bronze</h2>
+                <div class="package-price">RM35</div>
+                <ul class="package-features">
+                    <li>Basic Wash Treatment & Blow Dry</li>
+                    <li>Standard Nail Clippings</li>
+                    <li>Basic Hair-Trim Options (Face/Paws)</li>
+                    <li>Basic Dental Wipes</li>
+                </ul>
+            </div>
+
+            <div class="package-card silver">
+                <div class="popular-badge">MOST POPULAR</div>
+                <h2 class="package-name">Silver</h2>
+                <div class="package-price">RM55</div>
+                <ul class="package-features">
+                    <li>Premium Wash Treatment & Conditioner</li>
+                    <li>Nail Clippings & Filing</li>
+                    <li>Advanced Hair-Trim Options</li>
+                    <li>Advanced Dental Cleaning & Brushing</li>
+                </ul>
+            </div>
+
+            <div class="package-card">
+                <h2 class="package-name">Gold</h2>
+                <div class="package-price">RM85</div>
+                <ul class="package-features">
+                    <li>Luxury Spa Wash Treatment & Massage</li>
+                    <li>Nail Grinding for Smooth Edges</li>
+                    <li>Breed-Specific Full Hair-Trim</li>
+                    <li>Full Dental Cleaning & Tartar Polish</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Advanced JS Price Estimator -->
+        <section class="estimator-section">
+            <h2>Price Estimator</h2>
+            <p class="estimator-desc">Calculate the exact cost of your visit based on your pet's unique needs or select specific standalone services.</p>
+            
+            <form id="estimatorForm">
+                <div class="estimator-grid">
+                    <div class="form-group">
+                        <label>Base Grooming Package</label>
+                        <select id="estPackage">
+                            <option value="0">No Base Package (Specific Services Only)</option>
+                            <option value="35">Bronze Package (RM35)</option>
+                            <option value="55" selected>Silver Package (RM55)</option>
+                            <option value="85">Gold Package (RM85)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pet Size</label>
+                        <select id="estSize">
+                            <option value="0">Small / Under 10kg (+RM0)</option>
+                            <option value="15">Medium / 10-25kg (+RM15)</option>
+                            <option value="30">Large / Over 25kg (+RM30)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Coat Health</label>
+                        <select id="estCoat">
+                            <option value="0">Healthy & Maintained (+RM0)</option>
+                            <option value="10">Mild Tangling (+RM10)</option>
+                            <option value="25">Severe Matting / De-shedding (+RM25)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Specific Services & Spa Add-ons</label>
+                        <div class="addons-container">
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="15"> Nail Trimming Only (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="10"> Ear Cleaning Only (+RM10)</label>
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="15"> Flea & Tick Treatment (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="25"> De-matting (+RM25)</label>
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="15"> Blueberry Facial Scrub (+RM15)</label>
+                            <label class="checkbox-group"><input type="checkbox" class="spa-addon" value="20"> Soothing Mud Bath (+RM20)</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="total-display">
+                <span>Total Estimated Cost</span>
+                <span id="estTotal">RM55.00</span>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 Paws & Whiskers Pet Care & Grooming Centre. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/navigation.js"></script>
+    <script>
+        // Flawless Price Estimator Logic
+        const estPackage = document.getElementById('estPackage');
+        const estSize = document.getElementById('estSize');
+        const estCoat = document.getElementById('estCoat');
+        const spaAddons = document.querySelectorAll('.spa-addon');
+        const estTotal = document.getElementById('estTotal');
+
+        function calculateExactEstimate() {
+            let base = parseFloat(estPackage.value) || 0;
+            
+            // If they choose "No Base Package", don't charge extra for size/coat health automatically
+            // unless that's desired, but usually size charges apply to base packages.
+            // We will include them here as they might still want a specific service adjusted by size.
+            let size = base > 0 ? (parseFloat(estSize.value) || 0) : 0;
+            let coat = base > 0 ? (parseFloat(estCoat.value) || 0) : 0;
+            
+            let addonCost = 0;
+            
+            spaAddons.forEach(addon => { 
+                if (addon.checked) addonCost += parseFloat(addon.value); 
+            });
+            
+            let total = base + size + coat + addonCost;
+            
+            // Subtle animation effect on change
+            estTotal.style.opacity = '0.5';
+            setTimeout(() => {
+                estTotal.innerText = `RM${total.toFixed(2)}`;
+                estTotal.style.opacity = '1';
+            }, 150);
+        }
+
+        // Attach listeners to instantly compute
+        const inputs = [estPackage, estSize, estCoat, ...spaAddons];
+        inputs.forEach(input => {
+            input.addEventListener('change', calculateExactEstimate);
+        });
+        
+        // Initialize total on load
+        calculateExactEstimate();
+    </script>
+</body>
+</html>
