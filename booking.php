@@ -46,6 +46,18 @@ if ($userId > 0) {
     $petStmt->execute([$userId]);
     $pets = $petStmt->fetchAll();
 }
+
+ // Load active spa add-ons from MySQL
+$addonStmt = $pdo->prepare("
+    SELECT AddonID, AddonName, AddonPrice
+    FROM spa_addons
+    WHERE ActiveStatus = 1
+    ORDER BY AddonID
+");
+
+$addonStmt->execute();
+$addons = $addonStmt->fetchAll();
+
 ?>
 
 <!DOCTYPE html>
@@ -104,6 +116,35 @@ if ($userId > 0) {
             .form-grid { grid-template-columns: 1fr; }
             .addons-grid { grid-template-columns: 1fr; }
         }
+
+        .booking-total {
+            background: #f4efe8;
+            border: 1px solid #e4eee2;
+            border-radius: 15px;
+            padding: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .booking-total span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .booking-total strong {
+            font-size: 28px;
+            color: #527c57;
+            font-family: "DM Serif Display", serif;
+        }
+
+        @media (max-width: 600px) {
+            .booking-total {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -115,7 +156,7 @@ if ($userId > 0) {
             <div class="nav-links" id="navLinks">
                 <a href="index.html">Home</a>
                 <a href="service.html">Services</a>
-                <a href="packages.html">Packages</a>
+                <a href="packages.php">Packages</a>
                 <a href="groomers.html">Our Groomers</a>
                 <a href="contact.html">Contact</a>
                 <a href="booking.php" class="book-btn">Book Appointment</a>
@@ -208,6 +249,54 @@ if ($userId > 0) {
                         >
                     </div>
 
+                    <div class="form-group">
+                        <label for="petSize">Pet Size</label>
+
+                        <select
+                            id="petSize"
+                            name="pet_size"
+                            required
+                        >
+                            <option value="">Select pet size...</option>
+
+                            <option value="Small" data-price="0">
+                                Small (Under 10 kg) — Free
+                            </option>
+
+                            <option value="Medium" data-price="15">
+                                Medium (10–25 kg) — +RM15
+                            </option>
+
+                            <option value="Large" data-price="30">
+                                Large (Over 25 kg) — +RM30
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="coatCondition">Coat Condition</label>
+
+                        <select
+                            id="coatCondition"
+                            name="coat_condition"
+                            required
+                        >
+                            <option value="">Select coat condition...</option>
+
+                            <option value="Healthy" data-price="0">
+                                Healthy & Maintained — Free
+                            </option>
+
+                            <option value="Mild" data-price="10">
+                                Mild Tangling — +RM10
+                            </option>
+
+                            <option value="Severe" data-price="25">
+                                Severe Matting / De-shedding — +RM25
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="form-group full-width">
 
                         <label>Choose Grooming Service</label>
@@ -225,6 +314,12 @@ if ($userId > 0) {
                                         ENT_QUOTES,
                                         'UTF-8'
                                     ) ?>
+                                    data-price="<?= number_format(
+                                        (float)$service['BasePrice'],
+                                        2,
+                                        '.',
+                                        ''
+                                    ) ?>"
                                     (<?= htmlspecialchars($service['AnimalType']) ?>)
                                     - RM <?= number_format(
                                         (float)$service['BasePrice'],
@@ -239,17 +334,55 @@ if ($userId > 0) {
                     </div>
 
                     <div class="form-group full-width">
-                        <label>Specific Services & Spa Add-ons</label>
+                        <label>
+                            Specific Services & Spa Add-ons
+                        </label>
+
                         <div class="addons-grid">
-                            <!-- Basic standalone services added -->
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Nail Trimming Only (+RM15)"> Nail Trimming Only (+RM15)</label>
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Ear Cleaning Only (+RM10)"> Ear Cleaning Only (+RM10)</label>
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Flea & Tick Treatment (+RM15)"> Flea & Tick Treatment (+RM15)</label>
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="De-matting (+RM25)"> De-matting (+RM25)</label>
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Blueberry Facial (+RM15)"> Blueberry Facial (+RM15)</label>
-                            <label class="checkbox-group"><input type="checkbox" name="addon" value="Soothing Mud Bath (+RM20)"> Soothing Mud Bath (+RM20)</label>
+
+                            <?php foreach ($addons as $addon): ?>
+
+                                <label class="checkbox-group"> 
+                                    <input
+                                        type="checkbox"
+                                        name="addon_ids[]"
+                                        value="<?= (int)$addon['AddonID'] ?>"
+                                        data-price="<?= number_format(
+                                            (float)$addon['AddonPrice'],
+                                            2,
+                                            '.',
+                                            ''
+                                        ) ?>"
+                                    >
+
+                                    <?= htmlspecialchars(
+                                        $addon['AddonName'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+
+                                    (+RM <?= number_format(
+                                        (float)$addon['AddonPrice'],
+                                        2
+                                    ) ?>)
+                                </label>
+
+                            <?php endforeach; ?>
+
                         </div>
-                        <div class="error-msg" id="servicesError">Please select at least one specific service since you did not choose a base package.</div>
+
+                    </div>
+
+                    <div class="form-group full-width">
+                        <div class="booking-total">
+                            <span>Estimated Total</span>
+                            <strong id="bookingTotal">RM 0.00</strong>
+                        </div>
+
+                        <small>
+                            Total includes the selected grooming service
+                            and spa add-ons.
+                        </small>
                     </div>
 
                     <div class="form-group full-width">
@@ -385,6 +518,91 @@ if ($userId > 0) {
             return;
         }
     });
+
+    // Live booking price calculation
+
+    const addonCheckboxes = document.querySelectorAll(
+        'input[name="addon_ids[]"]'
+    );
+
+    const bookingTotalDisplay =
+        document.getElementById('bookingTotal');
+
+    const petSizeSelect =
+        document.getElementById('petSize');
+
+    const coatConditionSelect =
+        document.getElementById('coatCondition');
+
+    // Convert a selected option's price into cents
+    function getPriceCents(element) {
+        const price = Number(element?.dataset.price || 0);
+
+        return Number.isFinite(price) && price >= 0
+            ? Math.round(price * 100)
+            : 0;
+    }
+
+    function calculateBookingTotal() {
+
+        // 1. Selected grooming service
+        const selectedService =
+            serviceSelect.selectedOptions[0];
+
+        let totalCents = getPriceCents(selectedService);
+
+        // 2. Pet size surcharge
+        const selectedSize =
+            petSizeSelect.selectedOptions[0];
+
+        totalCents += getPriceCents(selectedSize);
+
+        // 3. Coat condition surcharge
+        const selectedCoat =
+            coatConditionSelect.selectedOptions[0];
+
+        totalCents += getPriceCents(selectedCoat);
+
+        // 4. Selected spa add-ons
+        addonCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                totalCents += getPriceCents(checkbox);
+            }
+        });
+
+        // 5. Display estimated total
+        bookingTotalDisplay.textContent =
+            `RM ${(totalCents / 100).toFixed(2)}`;
+    }
+
+    // Recalculate when service changes
+    serviceSelect.addEventListener(
+        'change',
+        calculateBookingTotal
+    );
+
+    // Recalculate when pet size changes
+    petSizeSelect.addEventListener(
+        'change',
+        calculateBookingTotal
+    );
+
+    // Recalculate when coat condition changes
+    coatConditionSelect.addEventListener(
+        'change',
+        calculateBookingTotal
+    );
+
+    // Recalculate when spa add-ons change
+    addonCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener(
+            'change',
+            calculateBookingTotal
+        );
+    });
+
+    // Display initial price
+    calculateBookingTotal();
     </script>
 
 </body>

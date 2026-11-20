@@ -45,6 +45,53 @@ $serviceId = filter_var(
 $groomer = $_POST['groomer_name'] ?? '';
 $date = $_POST['booking_date'] ?? '';
 $time = $_POST['booking_time'] ?? '';
+$petSize = $_POST['pet_size'] ?? '';
+$coatCondition = $_POST['coat_condition'] ?? '';
+
+// Pet size surcharges (in cents)
+$sizePrices = [
+    'Small' => 0,
+    'Medium' => 1500,
+    'Large' => 3000
+];
+
+// Coat condition surcharges (in cents)
+$coatPrices = [
+    'Healthy' => 0,
+    'Mild' => 1000,
+    'Severe' => 2500
+];
+
+// Validate pet size
+if (
+    !is_string($petSize) ||
+    !array_key_exists($petSize, $sizePrices)
+) {
+    http_response_code(400);
+    exit('Invalid pet size selection.');
+}
+
+// Validate coat condition
+if (
+    !is_string($coatCondition) ||
+    !array_key_exists($coatCondition, $coatPrices)
+) {
+    http_response_code(400);
+    exit('Invalid coat condition selection.');
+}
+
+// Calculate surcharges
+$sizeCents = $sizePrices[$petSize];
+$coatCents = $coatPrices[$coatCondition];
+
+// Format amounts for MySQL
+$sizeSurcharge = number_format(
+    $sizeCents / 100, 2, '.', ''
+);
+
+$coatSurcharge = number_format(
+    $coatCents / 100, 2, '.', ''
+);
 
 // Validate required fields
 if (
@@ -144,42 +191,178 @@ if ($pet['AnimalType'] !== $service['AnimalType']) {
 }
 
 // Price must come from MySQL, not the customer's form
-$totalPrice = $service['BasePrice'];
+ // Get selected spa add-ons
+$rawAddonIds = $_POST['addon_ids'] ?? [];
+
+if (!is_array($rawAddonIds) || count($rawAddonIds) > 20) {
+    http_response_code(400);
+    exit('Invalid spa add-on selection.');
+}
+
+$addonIds = [];
+
+// Validate every selected add-on ID
+foreach ($rawAddonIds as $rawId) {
+    if (!is_string($rawId)) {
+        http_response_code(400);
+        exit('Invalid spa add-on ID.');
+    }
+
+    $addonId = filter_var(
+        $rawId,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
+
+    if ($addonId === false) {
+        http_response_code(400);
+        exit('Invalid spa add-on ID.');
+    }
+
+    $addonIds[] = $addonId;
+}
+
+// Prevent duplicate add-on selections
+if (count($addonIds) !== count(array_unique($addonIds))) {
+    http_response_code(400);
+    exit('Duplicate spa add-ons are not allowed.');
+}
+
+// Retrieve selected add-ons from MySQL
+$addonRows = [];
+
+if (!empty($addonIds)) {
+    $placeholders = implode(
+        ',',
+        array_fill(0, count($addonIds), '?')
+    );
+
+    $addonStmt = $pdo->prepare("
+        SELECT AddonID, AddonName, AddonPrice
+        FROM spa_addons
+        WHERE ActiveStatus = 1
+          AND AddonID IN ($placeholders)
+    ");
+
+    $addonStmt->execute($addonIds);
+    $addonRows = $addonStmt->fetchAll();
+
+    // Ensure all selected add-ons exist and are active
+    if (count($addonRows) !== count($addonIds)) {
+        http_response_code(400);
+        exit('One or more selected add-ons are unavailable.');
+    }
+}
+
+// Calculate total using database prices
+// Work in cents to avoid rounding differences
+// 1. Main grooming service price
+$totalCents = (int) round(
+    (float)$service['BasePrice'] * 100
+);
+
+// 2. Pet size surcharge
+$totalCents += $sizeCents;
+
+// 3. Coat condition surcharge
+$totalCents += $coatCents;
+
+// 4. Spa add-on prices
+foreach ($addonRows as $addon) {
+    $totalCents += (int) round(
+        (float)$addon['AddonPrice'] * 100
+    );
+}
+
+// 5. Final total
+$totalPrice = number_format(
+    $totalCents / 100,
+    2,
+    '.',
+    ''
+);
 
 // Save the booking
 try {
+    // Start database transaction
+    $pdo->beginTransaction();
+
+    // 1. Save the main appointment
     $insert = $pdo->prepare("
         INSERT INTO appointments
         (
             PetID,
             ServiceID,
             GroomerName,
+            PetSize,
+            CoatCondition,
+            SizeSurcharge,
+            CoatSurcharge,
             BookingDate,
             BookingTime,
             TotalPrice,
             BookingStatus
         )
-        VALUES (?, ?, ?, ?, ?, ?, 'Pending')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
     ");
 
     $insert->execute([
         $petId,
         $serviceId,
         $groomer,
+        $petSize,
+        $coatCondition,
+        $sizeSurcharge,
+        $coatSurcharge,
         $date,
         $time,
         $totalPrice
     ]);
 
-    $bookingId = $pdo->lastInsertId();
+    // Get the newly created appointment ID
+    $bookingId = (int) $pdo->lastInsertId();
 
-    echo 'Booking submitted successfully!';
-    echo '<p>Booking ID: ' . (int) $bookingId . '</p>';
-    echo '<p>Status: Pending</p>';
+    // 2. Save selected spa add-ons
+    if (!empty($addonRows)) {
+
+        $addonInsert = $pdo->prepare("
+            INSERT INTO appointment_addons
+            (
+                AppointmentID,
+                AddonID,
+                ChargedPrice
+            )
+            VALUES (?, ?, ?)
+        ");
+
+        foreach ($addonRows as $addon) {
+            $addonInsert->execute([
+                $bookingId,
+                $addon['AddonID'],
+                $addon['AddonPrice']
+            ]);
+        }
+    }
+
+    // 3. Save all changes permanently
+    $pdo->commit();
+
+    // 4. Redirect to booking confirmation
+    header(
+        'Location: booking_success.php?id=' . $bookingId,
+        true,
+        303
+    );
+    exit;
 
 } catch (PDOException $e) {
 
-    // MySQL error 1062 means a UNIQUE constraint was violated
+    // Undo changes if something fails
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    // Handle duplicate groomer bookings
     $mysqlError = (int) ($e->errorInfo[1] ?? 0);
 
     if (
@@ -197,7 +380,7 @@ try {
         );
     }
 
-    // Log unexpected database errors privately
+    // Log unexpected errors privately
     error_log($e->getMessage());
 
     http_response_code(500);
