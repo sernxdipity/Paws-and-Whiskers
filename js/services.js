@@ -41,7 +41,7 @@ function displayServices(serviceList) {
                     <p>${service.description}</p>
                     <div class="service-bottom">
                         <span class="service-price">RM${service.price}</span>
-                        <a href="booking.html">Book Now →</a>
+                        <a href="booking.php">Book Now →</a>
                     </div>
                 </div>
             `;
