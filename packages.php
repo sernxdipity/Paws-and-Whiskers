@@ -81,43 +81,43 @@ $packageAddons = $addonStmt->fetchAll();
         .packages-header { text-align: center; padding: 80px 30px 40px; max-width: 800px; margin: auto; }
         .section-label { color: #789b75; font-size: 13px; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; }
         .packages-header h1 { font-size: 46px; margin-bottom: 15px; }
-        
+
         .pricing-grid { max-width: 1100px; margin: 0 auto 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 30px; }
         .package-card { background: white; border-radius: 25px; padding: 40px 30px; text-align: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; position: relative; display: flex; flex-direction: column; }
         .package-card:hover { transform: translateY(-7px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); }
         .package-card.silver { border: 2px solid #789b75; transform: scale(1.05); z-index: 1; }
         .package-card.silver:hover { transform: scale(1.05) translateY(-7px); }
-        
+
         .popular-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #789b75; color: white; padding: 6px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
         .package-name { font-family: "DM Serif Display", serif; font-size: 28px; margin-bottom: 10px; color: #333; }
         .package-price { font-size: 38px; font-weight: bold; color: #567353; margin-bottom: 25px; }
-        
+
         .package-features { list-style: none; padding: 0; margin-bottom: 35px; text-align: left; flex-grow: 1; }
         .package-features li { padding: 12px 0; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 15px; display: flex; align-items: flex-start; gap: 10px; }
         .package-features li::before { content: "✓"; color: #789b75; font-weight: bold; }
-        
+
         /* Estimator Styling */
         .estimator-section { max-width: 900px; margin: 0 auto 100px; background: #fffaf5; padding: 50px; border-radius: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); border: 1px solid #e4eee2; }
         .estimator-section h2 { font-size: 32px; margin-bottom: 10px; font-family: "DM Serif Display", serif; text-align: center; color: #2f352f; }
         .estimator-desc { text-align: center; color: #666; margin-bottom: 35px; }
-        
+
         .estimator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; }
         .form-group select { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; transition: 0.3s; font-family: inherit; cursor: pointer; }
         .form-group select:focus { border-color: #789b75; box-shadow: 0 0 0 3px rgba(120, 155, 117, 0.12); }
-        
+
         .addons-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; display: grid; grid-template-columns: 1fr; gap: 12px;}
         .checkbox-group { display: flex; align-items: center; gap: 12px; cursor: pointer; color: #555; font-size: 14px; margin: 0;}
         .checkbox-group input { transform: scale(1.2); accent-color: #789b75; cursor: pointer; }
-        
+
         .total-display { background: #2f352f; color: white; padding: 25px; border-radius: 15px; text-align: center; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
         .total-display span:first-child { font-size: 18px; font-weight: 500; }
         .total-display span#estTotal { font-size: 36px; font-weight: bold; color: #789b75; font-family: "DM Serif Display", serif; }
 
-        @media (max-width: 850px) { 
-            .package-card.silver { transform: scale(1); } 
+        @media (max-width: 850px) {
+            .package-card.silver { transform: scale(1); }
             .package-card.silver:hover { transform: translateY(-7px); }
-            .estimator-grid { grid-template-columns: 1fr; } 
+            .estimator-grid { grid-template-columns: 1fr; }
             .total-display { flex-direction: column; gap: 10px; }
         }
         @media (max-width: 600px) {
@@ -217,7 +217,7 @@ $packageAddons = $addonStmt->fetchAll();
         <!-- Dynamic Pricing Grid -->
         <section class="pricing-grid">
             <div class="package-card">
-                <h2 class="package-name">Bronze</h2>          
+                <h2 class="package-name">Bronze</h2>
                 <div class="package-price">
                     <?= displayPackagePrice($selectedPackages, 'Bronze') ?>
                 </div>
@@ -227,7 +227,17 @@ $packageAddons = $addonStmt->fetchAll();
                     <li>Basic Hair-Trim Options (Face/Paws)</li>
                     <li>Basic Dental Wipes</li>
                 </ul>
-            </div>
+
+                <?php if (isset($selectedPackages['Bronze'])): ?>
+                    <a
+                        href="booking.php?service_id=<?= (int)$selectedPackages['Bronze']['ServiceID'] ?>"
+                        class="package-book-btn"
+                    >
+                        Book Bronze Package
+                    </a>
+                <?php endif; ?>
+
+                </div>
 
             <div class="package-card silver">
                 <div class="popular-badge">MOST POPULAR</div>
@@ -241,7 +251,15 @@ $packageAddons = $addonStmt->fetchAll();
                     <li>Advanced Hair-Trim Options</li>
                     <li>Advanced Dental Cleaning & Brushing</li>
                 </ul>
-            </div>
+                <?php if (isset($selectedPackages['Silver'])): ?>
+                    <a
+                        href="booking.php?service_id=<?= (int)$selectedPackages['Silver']['ServiceID'] ?>"
+                        class="package-book-btn"
+                    >
+                        Book Silver Package
+                    </a>
+                <?php endif; ?>
+                </div>
 
             <div class="package-card">
                 <h2 class="package-name">Gold</h2>
@@ -254,6 +272,14 @@ $packageAddons = $addonStmt->fetchAll();
                     <li>Breed-Specific Full Hair-Trim</li>
                     <li>Full Dental Cleaning & Tartar Polish</li>
                 </ul>
+                <?php if (isset($selectedPackages['Gold'])): ?>
+                    <a
+                        href="booking.php?service_id=<?= (int)$selectedPackages['Gold']['ServiceID'] ?>"
+                        class="package-book-btn"
+                    >
+                        Book Gold Package
+                    </a>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -261,7 +287,7 @@ $packageAddons = $addonStmt->fetchAll();
         <section class="estimator-section">
             <h2>Price Estimator</h2>
             <p class="estimator-desc">Calculate the exact cost of your visit based on your pet's unique needs or select specific standalone services.</p>
-            
+
             <form id="estimatorForm">
                 <div class="estimator-grid">
                     <div class="form-group">
@@ -288,7 +314,7 @@ $packageAddons = $addonStmt->fetchAll();
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Pet Size</label>
                         <select id="estSize">
@@ -309,7 +335,7 @@ $packageAddons = $addonStmt->fetchAll();
 
                 </div>
             </form>
-            
+
             <div class="total-display">
                 <span>Total Estimated Cost</span>
                 <span id="estTotal">RM55.00</span>
@@ -334,19 +360,19 @@ $packageAddons = $addonStmt->fetchAll();
 
         function calculateExactEstimate() {
             let base = parseFloat(estPackage.value) || 0;
-            
+
             // FIX: Removed the condition that ignored size/coat charges if base was 0
             let size = parseFloat(estSize.value) || 0;
             let coat = parseFloat(estCoat.value) || 0;
-            
+
             let addonCost = 0;
-            
-            spaAddons.forEach(addon => { 
-                if (addon.checked) addonCost += parseFloat(addon.value); 
+
+            spaAddons.forEach(addon => {
+                if (addon.checked) addonCost += parseFloat(addon.value);
             });
-            
+
             let total = base + size + coat + addonCost;
-            
+
             // Subtle animation effect on change
             estTotal.style.opacity = '0.5';
             setTimeout(() => {
@@ -360,7 +386,7 @@ $packageAddons = $addonStmt->fetchAll();
         inputs.forEach(input => {
             input.addEventListener('change', calculateExactEstimate);
         });
-        
+
         // Initialize total on load
         calculateExactEstimate();
     </script>

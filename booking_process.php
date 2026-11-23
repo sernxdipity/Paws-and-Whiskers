@@ -5,6 +5,64 @@ require_once __DIR__ . '/config/db_connect.php';
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
+function returnToBookingWithError($message) {
+
+    // Save the error message
+    $_SESSION['booking_error'] = $message;
+
+    // Remember the submitted booking fields
+    $fields = [
+        'pet_id',
+        'service_id',
+        'groomer_name',
+        'booking_date',
+        'booking_time',
+        'pet_size',
+        'coat_condition'
+    ];
+
+    $oldBooking = [];
+
+    foreach ($fields as $field) {
+        $value = $_POST[$field] ?? '';
+
+        $oldBooking[$field] = is_string($value)
+            ? substr($value, 0, 100)
+            : '';
+    }
+
+    // Preserve selected spa add-ons
+    $addons = $_POST['addon_ids'] ?? [];
+
+    $oldBooking['addon_ids'] = [];
+
+    if (is_array($addons)) {
+        foreach (array_slice($addons, 0, 20) as $id) {
+            if (is_string($id) && ctype_digit($id)) {
+                $oldBooking['addon_ids'][] = $id;
+            }
+        }
+    }
+
+    $_SESSION['booking_old'] = $oldBooking;
+
+    // Preserve the selected grooming service
+    $serviceId = filter_var(
+        $oldBooking['service_id'],
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
+
+    $returnUrl = 'booking.php';
+
+    if ($serviceId) {
+        $returnUrl .= '?service_id=' . $serviceId;
+    }
+
+    header('Location: ' . $returnUrl, true, 303);
+    exit;
+}
+
 // Only accept booking form submissions
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -67,8 +125,7 @@ if (
     !is_string($petSize) ||
     !array_key_exists($petSize, $sizePrices)
 ) {
-    http_response_code(400);
-    exit('Invalid pet size selection.');
+    returnToBookingWithError('Invalid pet size selection.');
 }
 
 // Validate coat condition
@@ -76,8 +133,7 @@ if (
     !is_string($coatCondition) ||
     !array_key_exists($coatCondition, $coatPrices)
 ) {
-    http_response_code(400);
-    exit('Invalid coat condition selection.');
+    returnToBookingWithError('Invalid coat condition selection.');
 }
 
 // Calculate surcharges
@@ -100,8 +156,9 @@ if (
     !is_string($date) ||
     !is_string($time)
 ) {
-    http_response_code(400);
-    exit('Please complete all booking fields.');
+    returnToBookingWithError(
+        'Please complete all booking fields.'
+    );
 }
 
 // Verify selected groomer
@@ -112,8 +169,7 @@ $validGroomers = [
 ];
 
 if (!in_array($groomer, $validGroomers, true)) {
-    http_response_code(400);
-    exit('Invalid groomer selection.');
+    returnToBookingWithError('Invalid groomer selection.');
 }
 
 // Validate date and time
@@ -130,15 +186,13 @@ if (
     $appointment->format('Y-m-d H:i') !==
         $date . ' ' . $time
 ) {
-    http_response_code(400);
-    exit('Invalid appointment date or time.');
+    returnToBookingWithError('Invalid appointment date or time.');
 }
 
 $now = new DateTimeImmutable('now', $timezone);
 
 if ($appointment <= $now) {
-    http_response_code(400);
-    exit('Please choose a future appointment.');
+    returnToBookingWithError('Please choose a future appointment.');
 }
 
 // Check operating hours
@@ -150,8 +204,7 @@ $opening = $isWeekend ? '10:00' : '09:00';
 $closing = $isWeekend ? '18:00' : '19:00';
 
 if ($time < $opening || $time > $closing) {
-    http_response_code(400);
-    exit('Selected time is outside operating hours.');
+    returnToBookingWithError('Selected time is outside operating hours.');
 }
 
 // Verify that the pet belongs to the logged-in user
@@ -180,14 +233,12 @@ $serviceStmt->execute([$serviceId]);
 $service = $serviceStmt->fetch();
 
 if (!$service) {
-    http_response_code(400);
-    exit('Selected service is unavailable.');
+    returnToBookingWithError('Selected service is unavailable.');
 }
 
 // Check that the service matches the animal type
 if ($pet['AnimalType'] !== $service['AnimalType']) {
-    http_response_code(400);
-    exit('This service does not match your pet type.');
+    returnToBookingWithError('This service does not match your pet type.');
 }
 
 // Price must come from MySQL, not the customer's form
@@ -249,8 +300,7 @@ if (!empty($addonIds)) {
 
     // Ensure all selected add-ons exist and are active
     if (count($addonRows) !== count($addonIds)) {
-        http_response_code(400);
-        exit('One or more selected add-ons are unavailable.');
+        returnToBookingWithError('One or more selected add-ons are unavailable.');
     }
 }
 
@@ -357,33 +407,32 @@ try {
 
 } catch (PDOException $e) {
 
-    // Undo changes if something fails
+    // Undo incomplete database changes
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
 
-    // Handle duplicate groomer bookings
+    // Check for duplicate groomer bookings
     $mysqlError = (int) ($e->errorInfo[1] ?? 0);
+    $errorDetail = (string) ($e->errorInfo[2] ?? '');
 
     if (
         $e->getCode() === '23000' &&
-        $mysqlError === 1062
+        $mysqlError === 1062 &&
+        str_contains($errorDetail, 'uq_groomer_booking')
     ) {
-        http_response_code(409);
-
-        exit(
-            '<h2>Appointment Unavailable</h2>' .
-            '<p>This groomer is already booked at ' .
-            'the selected date and time.</p>' .
-            '<p>Please choose another slot.</p>' .
-            '<a href="booking.php">Back to Booking</a>'
+        returnToBookingWithError(
+            'This groomer is already booked at the selected ' .
+            'date and time. Please choose another slot.'
         );
     }
 
-    // Log unexpected errors privately
+    // Record unexpected errors privately
     error_log($e->getMessage());
 
-    http_response_code(500);
-    exit('Unable to save your booking.');
+    returnToBookingWithError(
+        'We could not save your appointment. ' .
+        'Please try again.'
+    );
 }
 ?>

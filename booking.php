@@ -4,11 +4,51 @@ session_start();
 if (empty($_SESSION['user_id']) ||
     (int) $_SESSION['user_id'] <= 0) {
 
-    http_response_code(401);
-
-    exit(
-        'Please log in before booking an appointment.'
+    $serviceId = filter_input(
+        INPUT_GET,
+        'service_id',
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
     );
+
+    $returnUrl = 'booking.php';
+
+    if ($serviceId) {
+        $returnUrl .= '?service_id=' . $serviceId;
+    }
+
+    header(
+        'Location: login.php?next=' .
+        rawurlencode($returnUrl)
+    );
+    exit;
+}
+
+// Retrieve server-side booking error
+$serverError = $_SESSION['booking_error'] ?? '';
+
+// Remove error after displaying it once
+unset($_SESSION['booking_error']);
+
+if (!is_string($serverError)) {
+    $serverError = '';
+}
+
+// Retrieve previous booking selections
+$oldBooking = $_SESSION['booking_old'] ?? [];
+
+// Clear saved data after retrieving it once
+unset($_SESSION['booking_old']);
+
+if (!is_array($oldBooking)) {
+    $oldBooking = [];
+}
+
+// Retrieve previously selected add-ons
+$oldAddonIds = $oldBooking['addon_ids'] ?? [];
+
+if (!is_array($oldAddonIds)) {
+    $oldAddonIds = [];
 }
 
 if (empty($_SESSION['csrf_token'])) {
@@ -29,8 +69,50 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $services = $stmt->fetchAll();
 
+ // Get the service ID passed from packages.php
+$selectedServiceId = filter_input(
+    INPUT_GET,
+    'service_id',
+    FILTER_VALIDATE_INT,
+    ['options' => ['min_range' => 1]]
+);
+
+// Invalid or missing ID means no preselection
+if (!$selectedServiceId) {
+    $selectedServiceId = 0;
+}
+
+// Prioritize the customer's previous selection
+$oldServiceId = filter_var(
+    $oldBooking['service_id'] ?? null,
+    FILTER_VALIDATE_INT,
+    ['options' => ['min_range' => 1]]
+);
+
+if ($oldServiceId !== false && $oldServiceId !== null) {
+    $selectedServiceId = (int)$oldServiceId;
+}
+
 // Get the logged-in customer's ID
 $userId = (int) ($_SESSION['user_id'] ?? 0);
+
+ // Retrieve logged-in customer's information
+$userStmt = $pdo->prepare("
+    SELECT FullName, PhoneNumber
+    FROM users
+    WHERE UserID = ?
+      AND Role = 'Customer'
+    LIMIT 1
+");
+
+$userStmt->execute([$userId]);
+$customer = $userStmt->fetch();
+
+// Verify the customer account exists
+if (!$customer) {
+    http_response_code(403);
+    exit('Only registered customers can book appointments.');
+}
 
 // Load only pets belonging to this customer
 $pets = [];
@@ -145,6 +227,56 @@ $addons = $addonStmt->fetchAll();
                 text-align: center;
             }
         }
+
+        .booking-error {
+            background: #fff1f0;
+            color: #a33232;
+            border: 1px solid #f1c0c0;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            grid-column: 1 / -1;
+        }
+
+        .booking-error[hidden] {
+            display: none;
+        }
+
+        .no-pets-message {
+            background: #fff8e8;
+            border: 1px solid #ead9ad;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .no-pets-message strong {
+            color: #795d29;
+            font-size: 16px;
+        }
+
+        .no-pets-message p {
+            color: #76674c;
+            font-size: 14px;
+            margin: 10px 0 18px;
+        }
+
+        .add-pet-btn {
+            display: inline-block;
+            padding: 11px 18px;
+            background: #789b75;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .add-pet-btn:hover {
+            background: #456b4f;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -185,29 +317,62 @@ $addons = $addonStmt->fetchAll();
                         value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>"
                     >
 
-                    <div class="form-group full-width">
-                        <label>Owner Name</label>
-                        <input type="text" id="ownerName" placeholder="Your full name" required>
+                    <div
+                        id="bookingError"
+                        class="booking-error"
+                        role="alert"
+                        <?= $serverError === '' ? 'hidden' : '' ?>
+                    >
+                        <?= htmlspecialchars(
+                            $serverError,
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>
                     </div>
 
                     <div class="form-group full-width">
-                        <label>Contact Phone (Malaysian format)</label>
+                        <label for="ownerName">Owner Name</label>
+
+                        <input
+                            type="text"
+                            id="ownerName"
+                            value="<?= htmlspecialchars(
+                                $customer['FullName'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            readonly
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="contactPhone">
+                            Contact Phone
+                        </label>
+
                         <input
                             type="tel"
                             id="contactPhone"
-                            placeholder="012-3456789"
-                            required
-                            pattern="^01\d-?\d{7,8}$"
-                            title="Please enter a valid Malaysian number (e.g., 012-3456789)"
-                            oninput="this.value = this.value.replace(/[^0-9-]/g, '')"
+                            value="<?= htmlspecialchars(
+                                $customer['PhoneNumber'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            readonly
                         >
-                        <div class="error-msg" id="phoneError">Invalid format. Must be a Malaysian number.</div>
+
+                        <small>
+                            Contact details are retrieved from
+                            your registered account.
+                        </small>
                     </div>
 
                     <div class="form-group">
                         <label for="petName">Select Your Pet</label>
 
-                        <select id="petName" name="pet_id" required>
+                        <select id="petName" name="pet_id" required
+                        <?= empty($pets) ? 'disabled' : '' ?>
+                        >
                             <option value="">Choose your pet...</option>
 
                             <?php foreach ($pets as $pet): ?>
@@ -218,6 +383,8 @@ $addons = $addonStmt->fetchAll();
                                         ENT_QUOTES,
                                         'UTF-8'
                                     ) ?>"
+                                    <?= (string)($oldBooking['pet_id'] ?? '') ===
+                                        (string)$pet['PetID'] ? 'selected' : '' ?>
                                 >
                                     <?= htmlspecialchars(
                                         $pet['PetName'],
@@ -230,11 +397,20 @@ $addons = $addonStmt->fetchAll();
 
                         <?php if ($userId === 0): ?>
                             <small>Please log in to select a pet.</small>
+
                         <?php elseif (empty($pets)): ?>
-                            <small>
-                                No registered pets found.
-                                Please register a pet first.
-                            </small>
+                            <div class="no-pets-message">
+                                <strong>No Pets Registered Yet!</strong>
+
+                                <p>
+                                    You need to register at least one pet
+                                    before making a grooming appointment.
+                                </p>
+
+                                <a href="dashboard.php" class="add-pet-btn">
+                                    Go to My Dashboard
+                                </a>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -259,15 +435,24 @@ $addons = $addonStmt->fetchAll();
                         >
                             <option value="">Select pet size...</option>
 
-                            <option value="Small" data-price="0">
+                            <option value="Small" data-price="0"
+                            <?= ($oldBooking['pet_size'] ?? '') === 'Small'
+                                ? 'selected' : '' ?>
+                            >
                                 Small (Under 10 kg) — Free
                             </option>
 
-                            <option value="Medium" data-price="15">
+                            <option value="Medium" data-price="15"
+                            <?= ($oldBooking['pet_size'] ?? '') === 'Medium'
+                                ? 'selected' : '' ?>
+                            >
                                 Medium (10–25 kg) — +RM15
                             </option>
 
-                            <option value="Large" data-price="30">
+                            <option value="Large" data-price="30"
+                            <?= ($oldBooking['pet_size'] ?? '') === 'Large'
+                                ? 'selected' : '' ?>
+                            >
                                 Large (Over 25 kg) — +RM30
                             </option>
                         </select>
@@ -283,15 +468,24 @@ $addons = $addonStmt->fetchAll();
                         >
                             <option value="">Select coat condition...</option>
 
-                            <option value="Healthy" data-price="0">
+                            <option value="Healthy" data-price="0"
+                            <?= ($oldBooking['coat_condition'] ?? '') === 'Healthy'
+                                ? 'selected' : '' ?>
+                            >
                                 Healthy & Maintained — Free
                             </option>
 
-                            <option value="Mild" data-price="10">
+                            <option value="Mild" data-price="10"
+                            <?= ($oldBooking['coat_condition'] ?? '') === 'Mild'
+                                ? 'selected' : '' ?>
+                            >
                                 Mild Tangling — +RM10
                             </option>
 
-                            <option value="Severe" data-price="25">
+                            <option value="Severe" data-price="25"
+                            <?= ($oldBooking['coat_condition'] ?? '') === 'Severe'
+                                ? 'selected' : '' ?>
+                            >
                                 Severe Matting / De-shedding — +RM25
                             </option>
                         </select>
@@ -306,21 +500,39 @@ $addons = $addonStmt->fetchAll();
                             required
                         >
                             <option value="">Choose a service...</option>
-
                             <?php foreach ($services as $service): ?>
-                                <option value="<?= (int)$service['ServiceID'] ?>">
-                                    <?= htmlspecialchars(
-                                        $service['ServiceName'],
+                                <option
+                                    value="<?= (int)$service['ServiceID'] ?>"
+
+                                    data-type="<?= htmlspecialchars(
+                                        $service['AnimalType'],
                                         ENT_QUOTES,
                                         'UTF-8'
-                                    ) ?>
+                                    ) ?>"
+
                                     data-price="<?= number_format(
                                         (float)$service['BasePrice'],
                                         2,
                                         '.',
                                         ''
                                     ) ?>"
-                                    (<?= htmlspecialchars($service['AnimalType']) ?>)
+
+                                    <?= $selectedServiceId === (int)$service['ServiceID']
+                                        ? 'selected'
+                                        : '' ?>
+                                >
+                                    <?= htmlspecialchars(
+                                        $service['ServiceName'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+
+                                    (<?= htmlspecialchars(
+                                        $service['AnimalType'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>)
+
                                     - RM <?= number_format(
                                         (float)$service['BasePrice'],
                                         2
@@ -342,7 +554,7 @@ $addons = $addonStmt->fetchAll();
 
                             <?php foreach ($addons as $addon): ?>
 
-                                <label class="checkbox-group"> 
+                                <label class="checkbox-group">
                                     <input
                                         type="checkbox"
                                         name="addon_ids[]"
@@ -353,6 +565,12 @@ $addons = $addonStmt->fetchAll();
                                             '.',
                                             ''
                                         ) ?>"
+
+                                        <?= in_array(
+                                            (string)$addon['AddonID'],
+                                            $oldAddonIds,
+                                            true
+                                        ) ? 'checked' : '' ?>
                                     >
 
                                     <?= htmlspecialchars(
@@ -380,8 +598,8 @@ $addons = $addonStmt->fetchAll();
                         </div>
 
                         <small>
-                            Total includes the selected grooming service
-                            and spa add-ons.
+                            Total includes the grooming service, pet size,
+                            coat condition, and selected spa add-ons.
                         </small>
                     </div>
 
@@ -395,15 +613,24 @@ $addons = $addonStmt->fetchAll();
                         >
                             <option value="">Choose a groomer...</option>
 
-                            <option value="Sarah Jenkins">
+                            <option value="Sarah Jenkins"
+                            <?= ($oldBooking['groomer_name'] ?? '') ===
+                                'Sarah Jenkins' ? 'selected' : '' ?>
+                            >
                                 Sarah Jenkins
                             </option>
 
-                            <option value="David Chen">
+                            <option value="David Chen"
+                            <?= ($oldBooking['groomer_name'] ?? '') ===
+                                'David Chen' ? 'selected' : '' ?>
+                            >
                                 David Chen
                             </option>
 
-                            <option value="Emma Watson">
+                            <option value="Emma Watson"
+                            <?= ($oldBooking['groomer_name'] ?? '') ===
+                                'Emma Watson' ? 'selected' : '' ?>
+                            >
                                 Emma Watson
                             </option>
                         </select>
@@ -416,13 +643,25 @@ $addons = $addonStmt->fetchAll();
                             id="appDate"
                             name="booking_date"
                             required
+
+                            value="<?= htmlspecialchars(
+                                (string)($oldBooking['booking_date'] ?? ''),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
                         >
                         <div class="error-msg" id="dateError">Date must be scheduled in the future.</div>
                     </div>
 
                     <div class="form-group">
                         <label>Time Slot</label>
-                        <input type="time" id="appTime" name="booking_time" required>
+                        <input type="time" id="appTime" name="booking_time" required
+                            value="<?= htmlspecialchars(
+                                (string)($oldBooking['booking_time'] ?? ''),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                        >
                         <div class="error-msg" id="timeError">Please select a valid time within our operating hours.</div>
                         <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
                             Mon-Fri: 9:00 AM - 7:00 PM | Sat-Sun: 10:00 AM - 6:00 PM
@@ -445,6 +684,19 @@ $addons = $addonStmt->fetchAll();
     <script src="js/navigation.js"></script>
     <script>
     const bookingForm = document.getElementById('bookingForm');
+
+    const bookingError = document.getElementById('bookingError');
+
+    function showBookingError(message) {
+        bookingError.textContent = message;
+        bookingError.hidden = false;
+
+        bookingError.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+
     const dateInput = document.getElementById('appDate');
     const timeInput = document.getElementById('appTime');
 
@@ -458,6 +710,10 @@ $addons = $addonStmt->fetchAll();
         petTypeInput.value = selected?.dataset.type || '';
     });
 
+    // Restore pet type when the page reloads
+    petTypeInput.value =
+        petSelect.selectedOptions[0]?.dataset.type || '';
+
     // Set minimum date using local time
     const now = new Date();
 
@@ -469,14 +725,11 @@ $addons = $addonStmt->fetchAll();
 
     dateInput.min = localToday;
 
-    // Temporarily disable add-ons until pricing is integrated
-    document.querySelectorAll('input[name="addon"]').forEach(box => {
-        box.checked = false;
-        box.disabled = true;
-    });
-
     // Validate booking before submitting
     bookingForm.addEventListener('submit', function(event) {
+        bookingError.hidden = true;
+        bookingError.textContent = '';
+
         const date = dateInput.value;
         const time = timeInput.value;
 
@@ -488,7 +741,7 @@ $addons = $addonStmt->fetchAll();
 
         if (!date || !time) {
             event.preventDefault();
-            alert('Please select an appointment date and time.');
+            showBookingError('Please select an appointment date and time.');
             return;
         }
 
@@ -496,7 +749,7 @@ $addons = $addonStmt->fetchAll();
 
         if (appointment <= new Date()) {
             event.preventDefault();
-            alert('Please choose a future appointment.');
+            showBookingError('Please choose a future appointment.');
             return;
         }
 
@@ -508,13 +761,13 @@ $addons = $addonStmt->fetchAll();
 
         if (time < opening || time > closing) {
             event.preventDefault();
-            alert('Please select a time within operating hours.');
+            showBookingError('Please select a time within operating hours.');
             return;
         }
 
         if (!petType || !serviceType || petType !== serviceType) {
             event.preventDefault();
-            alert('Please choose a grooming service matching your pet type.');
+            showBookingError('Please choose a grooming service matching your pet type.');
             return;
         }
     });
